@@ -251,3 +251,167 @@ plt.legend()
 plt.title('XGBoost Regression')
 plt.show()
 ```
+
+DT CV:
+
+```python
+from sklearn.linear_model import RidgeCV, LassoCV, ElasticNetCV
+
+# Example with Ridge Regression using cross-validation
+alphas = [0.001, 0.01, 0.1, 1, 10, 100]
+ridge_cv = RidgeCV(alphas=alphas, cv=5) # cv = cross validation fold
+ridge_cv.fit(X_train, y_train)
+best_alpha = ridge_cv.alpha_
+print(f"Best alpha for Ridge: {best_alpha}")
+
+# Similar approach for LassoCV and ElasticNetCV
+lasso_cv = LassoCV(alphas=alphas, cv=5)
+lasso_cv.fit(X_train, y_train)
+best_alpha_lasso = lasso_cv.alpha_
+print(f"Best alpha for Lasso: {best_alpha_lasso}")
+
+elastic_cv = ElasticNetCV(alphas=alphas, l1_ratio=[.1, .5, .7, .9, .95, .99, 1], cv=5)
+elastic_cv.fit(X_train, y_train)
+best_alpha_elastic = elastic_cv.alpha_
+best_l1_ratio_elastic = elastic_cv.l1_ratio_
+print(f"Best alpha for Elastic: {best_alpha_elastic}")
+print(f"Best l1_ratio for Elastic: {best_l1_ratio_elastic}")
+```
+
+Grid search:
+
+```python
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.datasets import make_regression, make_classification
+
+# Regression
+X_reg, y_reg = make_regression(n_samples=100, n_features=5, random_state=42)
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(X_reg, y_reg, test_size=0.2, random_state=42)
+
+param_grid_tree_reg = {
+    'max_depth': [None, 5, 10, 15],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+tree_reg = DecisionTreeRegressor(random_state=42)
+grid_search_tree_reg = GridSearchCV(tree_reg, param_grid_tree_reg, cv=5, scoring='neg_mean_squared_error')
+grid_search_tree_reg.fit(X_train_reg, y_train_reg)
+
+print("Best parameters for Tree Regressor:", grid_search_tree_reg.best_params_)
+
+# Classification
+X_clf, y_clf = make_classification(n_samples=100, n_features=5, n_classes=2, random_state=42)
+X_train_clf, X_test_clf, y_train_clf, y_test_clf = train_test_split(X_clf, y_clf, test_size=0.2, random_state=42)
+
+param_grid_tree_clf = {
+    'max_depth': [None, 5, 10, 15],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'criterion': ['gini', 'entropy'] # For classifier
+}
+
+tree_clf = DecisionTreeClassifier(random_state=42)
+grid_search_tree_clf = GridSearchCV(tree_clf, param_grid_tree_clf, cv=5, scoring='accuracy')
+grid_search_tree_clf.fit(X_train_clf, y_train_clf)
+
+print("Best parameters for Tree Classifier:", grid_search_tree_clf.best_params_)
+```
+
+RF CV:
+
+```python
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+
+param_grid_rf_reg = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [None, 10, 20],
+    'min_samples_split': [2, 5],
+    'min_samples_leaf': [1, 2]
+}
+
+rf_reg = RandomForestRegressor(random_state=42)
+grid_search_rf_reg = GridSearchCV(rf_reg, param_grid_rf_reg, cv=5, scoring='neg_mean_squared_error')
+grid_search_rf_reg.fit(X_train_reg, y_train_reg)
+
+print("Best parameters for Random Forest Regressor:", grid_search_rf_reg.best_params_)
+
+param_grid_rf_clf = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [None, 10, 20],
+    'min_samples_split': [2, 5],
+    'min_samples_leaf': [1, 2],
+    'criterion': ['gini', 'entropy']
+}
+
+rf_clf = RandomForestClassifier(random_state=42)
+grid_search_rf_clf = GridSearchCV(rf_clf, param_grid_rf_clf, cv=5, scoring='accuracy')
+grid_search_rf_clf.fit(X_train_clf, y_train_clf)
+
+print("Best parameters for Random Forest Classifier:", grid_search_rf_clf.best_params_)
+```
+
+GB CV:
+
+```python
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier
+
+param_grid_gb_reg = {
+    'n_estimators': [50, 100],
+    'learning_rate': [0.01, 0.1],
+    'max_depth': [3, 5]
+}
+
+gb_reg = GradientBoostingRegressor(random_state=42)
+grid_search_gb_reg = GridSearchCV(gb_reg, param_grid_gb_reg, cv=5, scoring='neg_mean_squared_error')
+grid_search_gb_reg.fit(X_train_reg, y_train_reg)
+
+print("Best parameters for Gradient Boosting Regressor:", grid_search_gb_reg.best_params_)
+
+param_grid_gb_clf = {
+    'n_estimators': [50, 100],
+    'learning_rate': [0.01, 0.1],
+    'max_depth': [3, 5]
+}
+
+gb_clf = GradientBoostingClassifier(random_state=42)
+grid_search_gb_clf = GridSearchCV(gb_clf, param_grid_gb_clf, cv=5, scoring='accuracy')
+grid_search_gb_clf.fit(X_train_clf, y_train_clf)
+
+print("Best parameters for Gradient Boosting Classifier:", grid_search_gb_clf.best_params_)
+```
+
+XGB CV:
+
+```python
+import xgboost as xgb
+
+param_grid_xgb_reg = {
+    'n_estimators': [50, 100],
+    'learning_rate': [0.01, 0.1],
+    'max_depth': [3, 5],
+    'reg_alpha':[0,1],
+    'reg_lambda':[1,2]
+}
+
+xgbr = xgb.XGBRegressor(objective='reg:squarederror', random_state=42)
+grid_search_xgb_reg = GridSearchCV(xgbr, param_grid_xgb_reg, cv=5, scoring='neg_mean_squared_error')
+grid_search_xgb_reg.fit(X_train_reg, y_train_reg)
+
+print("Best parameters for XGBoost Regressor:", grid_search_xgb_reg.best_params_)
+
+param_grid_xgb_clf = {
+    'n_estimators': [50, 100],
+    'learning_rate': [0.01, 0.1],
+    'max_depth': [3, 5],
+    'reg_alpha':[0,1],
+    'reg_lambda':[1,2]
+}
+
+xgbc = xgb.XGBClassifier(objective='binary:logistic', random_state=42)
+grid_search_xgb_clf = GridSearchCV(xgbc, param_grid_xgb_clf, cv=5, scoring='accuracy')
+grid_search_xgb_clf.fit(X_train_clf, y_train_clf)
+
+print("Best parameters for XGBoost Classifier:", grid_search_xgb_clf.best_params_)
+```
