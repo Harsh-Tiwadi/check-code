@@ -214,6 +214,40 @@ plt.show()
 
 XGBoost:
 
-```
+```python
+import xgboost as xgb
+import matplotlib.pyplot as plt
+import numpy as np
 
+
+
+# XGBoost Regression with Parameters
+xgbr = xgb.XGBRegressor(
+    objective='reg:squarederror',  # The learning objective. 'reg:squarederror' is standard for regression.
+    n_estimators=100,              # The number of boosting rounds (trees). (Range: 50-500+, Start around 100)
+    learning_rate=0.1,            # The step size shrinkage used to prevent overfitting. (Range: 0.001-1.0, Start low)
+    max_depth=3,                  # Maximum depth of a tree. Controls complexity. (Range: 3-10, Start around 3-6)
+    min_child_weight=1,           # Minimum sum of instance weight (hessian) needed in a child. Higher values prevent overfitting. (Range: 1-10+, Start low)
+    gamma=0,                      # Minimum loss reduction required to make a further partition on a leaf node. (Range: 0-1+, Start at 0)
+    subsample=1,                  # Subsample ratio of the training instance. Similar to subsample in GradientBoosting. (Range: 0.6-1.0, Start high)
+    colsample_bytree=1,           # Subsample ratio of columns when constructing each tree. (Range: 0.6-1.0, Start around 0.8-1)
+    colsample_bylevel=1,          # Subsample ratio of columns for each level.
+    reg_alpha=0,                  # L1 regularization term on weights. Increasing this value will make model more conservative.
+    reg_lambda=1,                 # L2 regularization term on weights. Increasing this value will make model more conservative.
+    random_state=None,            # Random seed for reproducibility.
+    n_jobs=-1,                    # Use all available cores.
+)
+
+# Train the model
+xgbr.fit(X, y)
+
+# Make predictions
+xgb_y_pred = xgbr.predict(X_test)
+
+# Visualization
+plt.scatter(X, y, label='Data')
+plt.plot(X_test, xgb_y_pred, color='black', label='XGBoost Regression Fit')
+plt.legend()
+plt.title('XGBoost Regression')
+plt.show()
 ```
